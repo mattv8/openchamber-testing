@@ -215,11 +215,11 @@ Open `https://github.com/mattv8/openchamber-testing/actions`, select the manual 
 
 - GitHub Actions runs in `mattv8/openchamber-testing`.
 - Prereleases and downloadable DMGs also appear in `mattv8/openchamber-testing`.
-- Every release should identify the exact source SHA that produced it.
+- Every release identifies the exact source SHA that produced it.
 - No Apple signing or notarization secrets are required for this unsigned build path.
 - The bundled OpenCode CLI is downloaded from official `anomalyco/opencode` GitHub releases matching the source tree's pinned SDK version.
 
-No successful build is claimed here yet.
+The initial canonical build completed in [run 32188205971](https://github.com/mattv8/openchamber-testing/actions/runs/32188205971) and published [custom-v1.18.4-build.1.1](https://github.com/mattv8/openchamber-testing/releases/tag/custom-v1.18.4-build.1.1).
 
 ## Unsigned macOS warning
 
