@@ -413,3 +413,36 @@ jobs:
           files: ${{ steps.validate_release.outputs.artifact_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write run summary
+        env:
+          ARTIFACT_NAME: ${{ needs.build.outputs.artifact_name }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          TAG_NAME: ${{ steps.validate_release.outputs.tag_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const artifactName = String(process.env.ARTIFACT_NAME || '').trim();
+          const tagName = String(process.env.TAG_NAME || '').trim();
+          if (!artifactName || !tagName) {
+            throw new Error('Release summary requires artifact and tag names.');
+          }
+
+          const releaseUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases/download/${encodeURIComponent(tagName)}/${encodeURIComponent(artifactName)}`;
+          const summary = [
+            '## OpenChamber custom macOS build',
+            '',
+            `[Download ${artifactName}](${releaseUrl})`,
+            '',
+            'This build is unsigned. After downloading it to `~/Downloads`, run:',
+            '',
+            '```sh',
+            `xattr -dr com.apple.quarantine "$HOME/Downloads/${artifactName}"`,
+            `open "$HOME/Downloads/${artifactName}"`,
+            '```',
+          ].join('\n');
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`);
+          NODE
