@@ -436,7 +436,7 @@ jobs:
             '',
             `[Download ${artifactName}](${releaseUrl})`,
             '',
-            'This build is unsigned. After downloading it to `~/Downloads`, run:',
+            'Use this unsigned build only if you trust its source. After downloading it to `~/Downloads`, run:',
             '',
             '```sh',
             `xattr -dr com.apple.quarantine "$HOME/Downloads/${artifactName}"`,
