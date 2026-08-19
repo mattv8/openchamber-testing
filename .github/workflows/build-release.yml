@@ -173,9 +173,12 @@ jobs:
             --mac \
             --arm64 \
             --publish=never \
-            --config.mac.identity=null \
+            --config.mac.identity=- \
             --config.mac.notarize=false \
             --config.dmg.sign=false
+          app_path="dist/mac-arm64/OpenChamber.app"
+          test -f "$app_path/Contents/_CodeSignature/CodeResources"
+          codesign --verify --deep --strict --verbose=4 "$app_path"
           bun run verify:opencode-cli:packaged
 
       - name: Package validated DMG and provenance
