@@ -225,10 +225,19 @@ The initial canonical build completed in [run 32188205971](https://github.com/ma
 
 Only use a downloaded DMG if you personally trust its source and the recorded provenance SHA.
 
-For a personally trusted downloaded DMG, macOS may block the first launch because the app is unsigned. Typical local removal of the quarantine attribute is:
+GitHub Actions artifacts are always downloaded as ZIP archives. To download the DMG without a ZIP wrapper, open the latest prerelease and download its `.dmg` asset directly.
+
+After downloading the trusted DMG, remove quarantine before opening it:
+
+```sh
+xattr -dr com.apple.quarantine "/path/to/OpenChamber-<version>-custom-<sha>-mac-arm64.dmg"
+open "/path/to/OpenChamber-<version>-custom-<sha>-mac-arm64.dmg"
+```
+
+Copy `OpenChamber.app` to `/Applications`. If macOS still retains quarantine on the copied app, remove it:
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/OpenChamber.app"
 ```
 
-That command removes Gatekeeper quarantine from the installed app on your machine. It does **not** make unsigned software generally safe.
+These commands remove Gatekeeper quarantine on your machine. They do **not** make unsigned software generally safe.
