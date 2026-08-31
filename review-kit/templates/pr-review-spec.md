@@ -1,6 +1,6 @@
 # PR review candidate spec
 
-Use this template for one local candidate file at `.scratch/pr-reviews/<batch-date>/pr-<number>.md`.
+Use this template for one local candidate file at `.scratch/pr-reviews/<batch-date>/pr-<number>.md` or `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`.
 
 Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 

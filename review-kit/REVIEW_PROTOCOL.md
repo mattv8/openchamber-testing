@@ -4,16 +4,52 @@ This protocol is the shared instruction set for one local PR review session. It 
 
 Do not copy PR-specific facts into this file. Read them from the candidate spec.
 
-## What a review session reads first
+## How a review session starts
 
-1. This file.
-2. The selected candidate spec at `.scratch/pr-reviews/<batch-date>/pr-<number>.md`.
+This protocol has two entry modes.
+
+### Prepared mode
+
+Use prepared mode when the prompt names an existing candidate spec.
+
+1. Read this file.
+2. Read the named candidate spec at `.scratch/pr-reviews/<batch-date>/pr-<number>.md`.
 
 Stop if either file is missing.
 
+### Discovery mode
+
+Use discovery mode when the prompt names no candidate spec.
+
+Before you discover anything:
+
+1. read this file;
+2. require a clean current worktree;
+3. record the exact current checkout `HEAD`;
+4. if the prompt names a PR number, fetch that PR;
+5. otherwise query open PRs associated with that exact `HEAD` commit.
+
+Discovery needs exactly one inferred PR. On zero or multiple results, stop and ask for an explicit PR-number override.
+
+The selected PR must be open, non-draft, mergeable, and pinned by `headRefOid` to the current checkout `HEAD`. An explicit PR-number override still has to match `HEAD`.
+
+During discovery, gather every field required by the candidate spec, including current metadata, prior thread state, real merge-base diff size, owning guidance, trust boundaries, runtime reachability questions, focused validation commands, and the manual QC command family.
+
+Populate the full template without writing it yet. Produce a placeholder-free complete spec. Leave no required section empty and leave no placeholders behind.
+
+Discovery writes only to the orchestration checkout. Do not write the live spec or any other file into the OpenChamber checkout.
+
+Validate all gathered facts and the completed spec before you replace any existing live spec.
+
+Only after that validation succeeds, write `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`, then re-read the written file and confirm it still has every required section and no placeholders.
+
+If any pre-write validation fails, leave the old live spec untouched and stop.
+
+After the live spec passes validation, continue in the same top-level session under the existing review-only workflow. This is a workflow boundary, not an agent-type change.
+
 ## Hard limits
 
-- Review only. Do not edit source, docs, tests, helper scripts, or scratch specs.
+- Discovery may write or replace only `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md` after full validation. Otherwise review only. Do not edit source, docs, tests, helper scripts, or scratch specs.
 - Do not create, remove, or modify worktrees.
 - Do not post to GitHub. No comments, reviews, labels, merges, closes, pushes, commits, or PR edits.
 - Do not invent missing facts. Report the gap instead.
@@ -45,6 +81,8 @@ Before you review code from the PR branch:
 3. do not read, run, or judge branch code after a mismatch.
 
 The review was scoped to one exact PR state. If the branch moved, the spec is stale.
+
+In discovery mode, this step applies after you write and validate the live spec. Re-check the current `HEAD` against the pinned SHA from that new spec before you read or run branch code.
 
 ## Step 2: load base-checkout guidance
 
@@ -169,3 +207,5 @@ Stop and report instead of guessing when any of these happen:
 - validation is blocked or fails for reasons you cannot separate from infrastructure noise.
 
 When you stop, report the blocking fact and do not continue to verdict drafting from stale assumptions.
+
+In discovery mode, stop before writing or replacing the live spec if any required field is missing, any placeholder remains, the completed spec contradicts the review-only rules above, or the post-write re-read shows a mismatch.
