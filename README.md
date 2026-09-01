@@ -52,7 +52,7 @@ git -C ../openchamber branch -vv
 
 ## Reviewer kit
 
-Start a new chat from a manually prepared, clean feature worktree that is already checked out at the PR's exact head. The fenced blocks below are prose you paste into chat, not shell commands.
+Start a new chat from a manually prepared, clean checkout. The fenced blocks below are prose you paste into chat, not shell commands.
 
 Use the generic kickoff when the checkout already makes the live PR obvious:
 
@@ -66,7 +66,7 @@ Use the explicit override when discovery would infer zero PRs or more than one P
 Read /Users/elfy/GitRepos/openchamber-testing/review-kit/REVIEW_PROTOCOL.md and begin in discovery mode for PR #3227 in this checkout.
 ```
 
-That override still fails if PR #3227 does not point at the checkout's exact HEAD. Discovery verifies the live PR, writes `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`, then switches to review-only mode. The protocol creates no worktree and makes no GitHub write.
+Discovery verifies the live PR, fetches and detaches that existing checkout at the current PR head, writes `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`, then switches to review-only mode. The protocol creates no worktree and makes no GitHub write.
 
 The review kickoff should produce three things: a clickable PR link, a complete final verdict comment draft, and one exact local QC command.
 

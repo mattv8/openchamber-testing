@@ -12,9 +12,9 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 - Author: `{{PR_AUTHOR}}`
 - Base branch: `{{PR_BASE}}`
 - Head branch: `{{PR_HEAD_BRANCH}}`
-- Pinned HEAD SHA: `{{PR_HEAD_SHA}}`
+- Reviewed HEAD SHA: `{{PR_HEAD_SHA}}`
 
-## Current PR state at selection time
+## Current PR state after bootstrap
 
 - Open state: `{{PR_STATE}}`
 - Draft state: `{{PR_DRAFT_STATE}}`
@@ -61,7 +61,7 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 
 ## Review-session reminders
 
-- Verify the current checkout `HEAD` equals `{{PR_HEAD_SHA}}` before reading or running branch code.
+- Record the verified bootstrap result for `{{PR_HEAD_SHA}}` here. Do not require the pre-bootstrap checkout to already match it.
 - Do not create a worktree.
 - Do not post to GitHub.
 - Return exactly three outputs:

@@ -31,21 +31,29 @@ test('README keeps the exact reviewer-kit kickoff prompts and suite command', ()
   assert.match(README, new RegExp(escapeRegex(COMPLETE_TEST_SUITE_COMMAND)));
 });
 
-test('protocol keeps prepared and discovery entry gates tied to exact HEAD', () => {
+test('protocol bootstraps the review checkout at the PR current head', () => {
   assert.match(PROTOCOL, /discovery mode/i);
   assert.match(PROTOCOL, /prepared mode/i);
   assert.match(PROTOCOL, /clean (?:current )?(?:checkout|worktree)/i);
-  assert.match(PROTOCOL, /exact\s+HEAD|current checkout `HEAD` matches the pinned SHA/i);
+  assert.match(PROTOCOL, /headRepository\.url/i);
+  assert.match(PROTOCOL, /git fetch --no-tags/i);
+  assert.match(PROTOCOL, /git rev-parse FETCH_HEAD/i);
+  assert.match(PROTOCOL, /git switch --detach FETCH_HEAD/i);
   assert.match(PROTOCOL, /open state|open\/non-draft\/mergeable|open, non-draft, mergeable/i);
   assert.match(PROTOCOL, /draft state|non-draft/i);
   assert.match(PROTOCOL, /mergeability|mergeable/i);
-  assert.match(PROTOCOL, /selected PR .* current checkout `HEAD`|HEAD matches the pinned SHA|head equality to the checkout/i);
+  assert.match(PROTOCOL, /refresh(?: the)? current PR metadata(?:[^\n]|\n)*repeat(?:[^\n]|\n)*(?:once|second attempt)|branch moved(?:[^\n]|\n)*refresh(?:[^\n]|\n)*(?:once|second attempt)/i);
 });
 
-test('protocol keeps inference and override pinned to the current checkout HEAD', () => {
-  assert.match(PROTOCOL, /PRs associated with (?:that )?exact `HEAD` commit|associated with the exact commit/i);
+test('protocol keeps bootstrap as the only checkout mutation and later phases review-only', () => {
+  assert.match(PROTOCOL, /only permitted(?:[^\n]|\n)*(?:checkout )?mutations(?:[^\n]|\n)*bootstrap commands|bootstrap commands(?:[^\n]|\n)*only permitted(?:[^\n]|\n)*(?:checkout )?mutations/i);
+  assert.match(PROTOCOL, /review-only phase after bootstrap|after bootstrap(?:[^\n]|\n)*review-only/i);
+  assert.doesNotMatch(PROTOCOL, /candidate spec(?:[^\n]|\n){0,120}block bootstrap|bootstrap(?:[^\n]|\n){0,120}blocked by(?:[^\n]|\n){0,80}candidate spec SHA/i);
+});
+
+test('protocol says candidate-spec SHA cannot block bootstrap', () => {
   assert.match(PROTOCOL, /zero or multiple results require an explicit PR-number override|explicit PR-number override/i);
-  assert.match(PROTOCOL, /override still must match `HEAD`|override .* match .*HEAD/i);
+  assert.match(PROTOCOL, /candidate-spec SHA cannot block bootstrap|candidate spec SHA.*cannot block bootstrap|bootstrap before candidate-spec SHA validation|older SHA recorded in a candidate spec(?:[^\n]|\n)*never blocks bootstrap/i);
 });
 
 test('protocol and template keep live-spec writes isolated and transactional', () => {
@@ -61,9 +69,17 @@ test('protocol and template preserve review-only handoff and final outputs', () 
   assert.match(PROTOCOL, /at most three subagent sessions|up to three subagent sessions/i);
   assert.match(PROTOCOL, /never multiple reviewers|never run multiple reviewers/i);
   assert.match(PROTOCOL, /exactly three outputs/i);
+  assert.match(TEMPLATE, /Reviewed HEAD SHA/i);
+  assert.doesNotMatch(TEMPLATE, /Pinned HEAD SHA/i);
   assert.match(TEMPLATE, /^## Trust boundaries and runtime reachability$/m);
   assert.match(TEMPLATE, /^## Review focus$/m);
   assert.match(TEMPLATE, /^## Manual QC launch hint$/m);
+});
+
+test('README describes clean checkout bootstrap at the current PR head', () => {
+  assert.match(README, /clean checkout/i);
+  assert.match(README, /protocol fetches the current PR head|fetches and detaches .* current PR head/i);
+  assert.doesNotMatch(README, /already checked out at the PR'?s exact head|already needs the PR'?s exact head/i);
 });
 
 function escapeRegex(value) {
