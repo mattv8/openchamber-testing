@@ -243,6 +243,12 @@ Run it from this repository root:
 
 Open `https://github.com/mattv8/openchamber-testing/actions`, select the manual workflow defined by `.github/workflows/build-release.yml`, click **Run workflow**, and leave `source_ref` at its default `openchamber-custom` unless you want to test another already-pushed ref from `mattv8/openchamber`.
 
+## Automatic custom releases
+
+`.github/workflows/watch-custom-release.yml` checks `mattv8/openchamber:openchamber-custom` every 15 minutes and also supports manual dispatch from the Actions tab. It skips builds when the current 40-character source SHA already appears in prerelease provenance as the generated `Source commit:` line.
+
+Rapid pushes can collapse into one build for the newest unreleased SHA because the watcher never cancels an in-progress automatic run. Manual dispatch of `build-release.yml` still works when you want to force or test a specific pushed ref from `mattv8/openchamber`.
+
 ## Build and release behavior
 
 - GitHub Actions runs in `mattv8/openchamber-testing`.

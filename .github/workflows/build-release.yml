@@ -1,6 +1,12 @@
 name: Build Custom Release
 
 on:
+  workflow_call:
+    inputs:
+      source_ref:
+        description: Source ref in mattv8/openchamber
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       source_ref:
