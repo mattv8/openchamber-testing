@@ -12,7 +12,8 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 - Author: `{{PR_AUTHOR}}`
 - Base branch: `{{PR_BASE}}`
 - Head branch: `{{PR_HEAD_BRANCH}}`
-- Reviewed HEAD SHA: `{{PR_HEAD_SHA}}`
+- Reviewed checkout HEAD SHA: `{{REVIEWED_CHECKOUT_HEAD_SHA}}`
+- Current remote PR HEAD SHA: `{{PR_HEAD_SHA}}`
 
 ## Current PR state after bootstrap
 
@@ -61,7 +62,7 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 
 ## Review-session reminders
 
-- Record the verified bootstrap result for `{{PR_HEAD_SHA}}` here. Do not require the pre-bootstrap checkout to already match it.
+- Review the recorded checkout SHA `{{REVIEWED_CHECKOUT_HEAD_SHA}}`; treat the remote PR-head SHA `{{PR_HEAD_SHA}}` as freshness context.
 - Do not create a worktree.
 - Do not post to GitHub.
 - Return exactly three outputs:

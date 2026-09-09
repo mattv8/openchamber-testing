@@ -31,29 +31,33 @@ test('README keeps the exact reviewer-kit kickoff prompts and suite command', ()
   assert.match(README, new RegExp(escapeRegex(COMPLETE_TEST_SUITE_COMMAND)));
 });
 
-test('protocol bootstraps the review checkout at the PR current head', () => {
+test('protocol reviews the prepared checkout HEAD and treats PR state as context', () => {
   assert.match(PROTOCOL, /discovery mode/i);
   assert.match(PROTOCOL, /prepared mode/i);
   assert.match(PROTOCOL, /clean (?:current )?(?:checkout|worktree)/i);
+  assert.match(PROTOCOL, /git rev-parse HEAD/i);
+  assert.match(PROTOCOL, /reviewed SHA/i);
+  assert.match(PROTOCOL, /review and validate the code at the recorded checkout HEAD|scope(?:s)? (?:the )?review to (?:the )?reviewed SHA/i);
   assert.match(PROTOCOL, /headRepository\.url/i);
-  assert.match(PROTOCOL, /git fetch --no-tags/i);
-  assert.match(PROTOCOL, /git rev-parse FETCH_HEAD/i);
-  assert.match(PROTOCOL, /git switch --detach FETCH_HEAD/i);
-  assert.match(PROTOCOL, /open state|open\/non-draft\/mergeable|open, non-draft, mergeable/i);
-  assert.match(PROTOCOL, /draft state|non-draft/i);
-  assert.match(PROTOCOL, /mergeability|mergeable/i);
-  assert.match(PROTOCOL, /refresh(?: the)? current PR metadata(?:[^\n]|\n)*repeat(?:[^\n]|\n)*(?:once|second attempt)|branch moved(?:[^\n]|\n)*refresh(?:[^\n]|\n)*(?:once|second attempt)/i);
+  assert.match(PROTOCOL, /state(?:[^\n]|\n){0,120}as metadata/i);
+  assert.match(PROTOCOL, /closed(?:[^\n]|\n){0,120}draft(?:[^\n]|\n){0,120}(?:conflict|CONFLICTING)(?:[^\n]|\n){0,160}review context(?:[^\n]|\n){0,160}not stop conditions/i);
+  assert.match(PROTOCOL, /difference between the reviewed(?: checkout HEAD)? SHA and (?:current remote PR )?`headRefOid`(?:[^\n]|\n){0,160}review context(?:[^\n]|\n){0,160}not stop conditions/i);
+  assert.match(PROTOCOL, /immediate(?:ly)? before (?:the )?verdict(?:[^\n]|\n){0,240}refresh(?:[^\n]|\n){0,240}metadata/i);
+  assert.match(PROTOCOL, /git fetch --no-tags <headRepository\.url> <headRefName>/i);
+  assert.match(PROTOCOL, /reviewed(?: checkout HEAD)? SHA(?:[^\n]|\n){0,200}(?:fetched\/remote PR HEAD|current remote PR HEAD) SHA(?:[^\n]|\n){0,200}(?:continue|exactly three outputs|required outputs)/i);
+  assert.doesNotMatch(PROTOCOL, /git switch --detach FETCH_HEAD/i);
+  assert.doesNotMatch(PROTOCOL, /FETCH_HEAD(?:[^\n]|\n){0,160}(?:equal|match|===?)(?:[^\n]|\n){0,160}headRefOid|headRefOid(?:[^\n]|\n){0,160}(?:equal|match|===?)(?:[^\n]|\n){0,160}FETCH_HEAD/i);
+  assert.doesNotMatch(PROTOCOL, /(?:require|must be|only if)(?:[^\n]|\n){0,120}mergeable(?:[^\n]|\n){0,120}before review|before review(?:[^\n]|\n){0,120}(?:require|must be|only if)(?:[^\n]|\n){0,120}mergeable/i);
 });
 
-test('protocol keeps bootstrap as the only checkout mutation and later phases review-only', () => {
-  assert.match(PROTOCOL, /only permitted(?:[^\n]|\n)*(?:checkout )?mutations(?:[^\n]|\n)*bootstrap commands|bootstrap commands(?:[^\n]|\n)*only permitted(?:[^\n]|\n)*(?:checkout )?mutations/i);
-  assert.match(PROTOCOL, /review-only phase after bootstrap|after bootstrap(?:[^\n]|\n)*review-only/i);
-  assert.doesNotMatch(PROTOCOL, /candidate spec(?:[^\n]|\n){0,120}block bootstrap|bootstrap(?:[^\n]|\n){0,120}blocked by(?:[^\n]|\n){0,80}candidate spec SHA/i);
+test('protocol keeps the prepared checkout unchanged and later phases review-only', () => {
+  assert.match(PROTOCOL, /keep its checked-out files unchanged throughout review/i);
+  assert.match(PROTOCOL, /review-only phase after validation|session is otherwise review-only/i);
 });
 
-test('protocol says candidate-spec SHA cannot block bootstrap', () => {
+test('protocol says candidate-spec SHA cannot block review', () => {
   assert.match(PROTOCOL, /zero or multiple results require an explicit PR-number override|explicit PR-number override/i);
-  assert.match(PROTOCOL, /candidate-spec SHA cannot block bootstrap|candidate spec SHA.*cannot block bootstrap|bootstrap before candidate-spec SHA validation|older SHA recorded in a candidate spec(?:[^\n]|\n)*never blocks bootstrap/i);
+  assert.match(PROTOCOL, /candidate-spec SHA cannot block review|candidate spec SHA.*cannot block review|older SHA recorded in a candidate spec(?:[^\n]|\n)*never blocks review/i);
 });
 
 test('protocol and template keep live-spec writes isolated and transactional', () => {
@@ -69,17 +73,20 @@ test('protocol and template preserve review-only handoff and final outputs', () 
   assert.match(PROTOCOL, /at most three subagent sessions|up to three subagent sessions/i);
   assert.match(PROTOCOL, /never multiple reviewers|never run multiple reviewers/i);
   assert.match(PROTOCOL, /exactly three outputs/i);
-  assert.match(TEMPLATE, /Reviewed HEAD SHA/i);
+  assert.match(TEMPLATE, /Reviewed checkout HEAD SHA/i);
+  assert.match(TEMPLATE, /Current remote PR HEAD SHA/i);
   assert.doesNotMatch(TEMPLATE, /Pinned HEAD SHA/i);
+  assert.doesNotMatch(TEMPLATE, /Record the verified bootstrap result/i);
   assert.match(TEMPLATE, /^## Trust boundaries and runtime reachability$/m);
   assert.match(TEMPLATE, /^## Review focus$/m);
   assert.match(TEMPLATE, /^## Manual QC launch hint$/m);
 });
 
-test('README describes clean checkout bootstrap at the current PR head', () => {
+test('README describes prepared-checkout-HEAD review with a non-switching remote check', () => {
   assert.match(README, /clean checkout/i);
-  assert.match(README, /protocol fetches the current PR head|fetches and detaches .* current PR head/i);
-  assert.doesNotMatch(README, /already checked out at the PR'?s exact head|already needs the PR'?s exact head/i);
+  assert.match(README, /prepared checkout(?:'s)? HEAD|prepared-checkout-HEAD/i);
+  assert.match(README, /(?:final remote check|immediately before the verdict)(?:[^\n]|\n){0,160}(?:does not|without|never)(?:[^\n]|\n){0,80}(?:move|switch|detach)(?:[^\n]|\n){0,80}checkout/i);
+  assert.doesNotMatch(README, /protocol fetches the current PR head|fetches and detaches .* current PR head/i);
 });
 
 function escapeRegex(value) {

@@ -66,9 +66,9 @@ Use the explicit override when discovery would infer zero PRs or more than one P
 Read /Users/elfy/GitRepos/openchamber-testing/review-kit/REVIEW_PROTOCOL.md and begin in discovery mode for PR #3227 in this checkout.
 ```
 
-Discovery verifies the live PR, fetches and detaches that existing checkout at the current PR head, writes `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`, then switches to review-only mode. The protocol creates no worktree and makes no GitHub write.
+Discovery verifies the live PR, records and reviews the prepared checkout HEAD, writes `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md`, then switches to review-only mode. Immediately before the verdict, the reviewer refreshes metadata and fetches the PR head to report drift without switching the checkout or stopping because the PR is conflicting. The protocol creates no worktree and makes no GitHub write.
 
-The review kickoff should produce three things: a clickable PR link, a complete final verdict comment draft, and one exact local QC command.
+The review kickoff should produce exactly three outputs: a clickable PR link, a complete final verdict comment draft, and one exact local QC command.
 
 Run the focused contract test when you change the review protocol:
 

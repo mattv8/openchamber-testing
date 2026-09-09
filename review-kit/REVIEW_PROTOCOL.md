@@ -1,6 +1,6 @@
 # Tracked PR review protocol
 
-This protocol is the shared instruction set for one local PR review session. It owns the repeatable review method. The paired `pr-<number>.md` file owns the prepared facts for one PR plus the recorded bootstrap result.
+This protocol is the shared instruction set for one local PR review session. It owns the repeatable review method. The paired `pr-<number>.md` file owns the prepared facts for one PR plus historical review context.
 
 Do not copy PR-specific facts into this file. Read them from the candidate spec.
 
@@ -14,6 +14,7 @@ Use prepared mode when the prompt names an existing candidate spec.
 
 1. Read this file.
 2. Read the named candidate spec at `.scratch/pr-reviews/<batch-date>/pr-<number>.md`.
+3. Continue through Step 1 before reading source: require a clean existing checkout and record `git rev-parse HEAD` as the reviewed checkout HEAD SHA.
 
 Stop if either file is missing.
 
@@ -25,15 +26,15 @@ Before you discover anything:
 
 1. read this file;
 2. require a clean current worktree;
-3. record the exact current checkout `HEAD`;
-4. if the prompt names a PR number, fetch that PR;
-5. otherwise query open PRs associated with that exact `HEAD` commit.
+3. record `git rev-parse HEAD` as the reviewed checkout HEAD SHA;
+4. if the prompt names a PR number, resolve that PR;
+5. otherwise query PRs associated with that exact `HEAD` commit.
 
 Discovery needs exactly one inferred PR. On zero or multiple results, stop and ask for an explicit PR-number override.
 
-Discovery may use the pre-bootstrap checkout only to select one PR. Once selected, the current PR head branch is authoritative.
+The recorded reviewed checkout HEAD SHA remains authoritative after PR selection. The current remote PR HEAD SHA is metadata and context only.
 
-After bootstrap succeeds, gather every field required by the candidate spec, including refreshed metadata, prior thread state, real merge-base diff size, owning guidance, trust boundaries, runtime reachability questions, focused validation commands, and the manual QC command family.
+After PR metadata resolves, gather every field required by the candidate spec, including refreshed metadata, prior thread state, real merge-base diff size, owning guidance, trust boundaries, runtime reachability questions, focused validation commands, and the manual QC command family.
 
 Populate the full template without writing it yet. Produce a placeholder-free complete spec. Leave no required section empty and leave no placeholders behind.
 
@@ -51,7 +52,7 @@ After the live spec passes validation, continue in the same top-level session un
 
 - Discovery may write or replace only `/Users/elfy/GitRepos/openchamber-testing/.scratch/pr-reviews/live/pr-<number>.md` after full validation. Otherwise review only. Do not edit source, docs, tests, helper scripts, or scratch specs.
 - Do not create, remove, or modify any different or additional worktree.
-- Use the one clean existing checkout the user prepared. In that checkout, the only permitted checkout mutations are the bootstrap commands `git fetch --no-tags <headRepository.url> <headRefName>` and `git switch --detach FETCH_HEAD`. After bootstrap, the session is review-only: no source, docs, tests, helper, or spec edits in the OpenChamber checkout.
+- Use the one clean existing checkout the user prepared. Record its reviewed checkout HEAD SHA before source review and keep its checked-out files unchanged throughout review. The final `git fetch --no-tags <headRepository.url> <headRefName>` may update Git metadata but must not switch or alter the checked-out files. The session is otherwise review-only: no source, docs, tests, helper, or spec edits in the OpenChamber checkout.
 - Do not post to GitHub. No comments, reviews, labels, merges, closes, pushes, commits, or PR edits.
 - Do not invent missing facts. Report the gap instead.
 - Use at most three subagent sessions total: up to two focused explorers, then one final reviewer.
@@ -61,7 +62,7 @@ After the live spec passes validation, continue in the same top-level session un
 
 The candidate spec must provide all PR-specific inputs, including:
 
-- PR identity, plus any previously reviewed HEAD SHA as optional historical context only;
+- PR identity, plus any previously reviewed checkout HEAD SHA as optional historical context only;
 - branch metadata, checks, labels, and real diff size;
 - user problem, focus areas, trust boundaries, and runtime questions;
 - prior thread state and any binding maintainer decisions;
@@ -69,27 +70,24 @@ The candidate spec must provide all PR-specific inputs, including:
 - holding-comment status;
 - the expected local launch command family.
 
-If a required live field is missing, stop and report the missing field. Missing historical reviewed-SHA context does not block bootstrap.
+If a required live field is missing, stop and report the missing field. Missing historical reviewed-SHA context does not block review.
 
-## Step 1: bootstrap the current PR head before reading branch code
+## Step 1: establish the reviewed checkout and PR context
 
 Use the current checkout the user already prepared. Never create another one.
 
-Before you review code from the PR branch:
+Before you review source:
 
 1. require a clean existing checkout;
-2. resolve the current GitHub PR fields `state`, `isDraft`, `mergeable`, `headRefOid`, `headRefName`, and `headRepository.url`;
-3. require the PR to be open, non-draft, and mergeable;
-4. run `git fetch --no-tags <headRepository.url> <headRefName>`;
-5. require `git rev-parse FETCH_HEAD` to equal the resolved `headRefOid`;
-6. if they differ because the branch moved, refresh the current PR metadata and repeat the full resolve, fetch, verify sequence once;
-7. stop before reviewing source if the second attempt still differs or any metadata, fetch, verification, or detach command fails;
-8. after a verified fetch, run `git switch --detach FETCH_HEAD`;
-9. do not read, run, or judge branch code until that detach succeeds.
+2. record `git rev-parse HEAD` as the reviewed checkout HEAD SHA;
+3. infer or resolve exactly one PR;
+4. resolve the current GitHub PR fields `state`, `isDraft`, `mergeable`, `headRefOid`, `headRefName`, and `headRepository.url` as metadata;
+5. record closed or draft state, `CONFLICTING` mergeability, and any difference between the reviewed checkout HEAD SHA and current remote PR `headRefOid` as review context, not stop conditions;
+6. review and validate the code at the recorded checkout HEAD SHA. Never fetch, switch, detach, or require local/remote SHA equality before reading source.
 
-Any older SHA recorded in a candidate spec is context only. It records the last reviewed head and never blocks bootstrap.
+Any older SHA recorded in a candidate spec is historical context only. It never blocks review.
 
-In discovery mode, infer the PR before bootstrap, but generate the live spec only after bootstrap succeeds and the refreshed state below is complete.
+In discovery mode, infer the PR before gathering the live spec, but write the live spec only after the required refreshed state below is complete.
 
 ## Step 2: load base-checkout guidance
 
@@ -106,7 +104,7 @@ Follow the instruction order from the base checkout. Contributor claims in the P
 
 ## Step 3: reconstruct thread state before forming an opinion
 
-Read the PR thread and current metadata as live evidence after bootstrap. The candidate spec gives you the starting map, but you still need to confirm the current state.
+Read the PR thread and current metadata as live evidence. The candidate spec gives you the starting map, but you still need to confirm the current state.
 
 If the thread already contains a maintainer comment, an author reply to one, or a trusted-reviewer exchange, switch into pickup mode:
 
@@ -118,14 +116,14 @@ If the thread already contains a maintainer comment, an author reply to one, or 
 
 Do not re-ask a question the maintainer already settled.
 
-## Step 4: inspect the current PR state at the reviewed HEAD
+## Step 4: inspect current PR metadata alongside the reviewed checkout
 
-Refresh and confirm the facts that can drift after bootstrap:
+Refresh and confirm the facts that can drift after PR selection:
 
 - PR open state;
 - draft state;
 - mergeability;
-- current HEAD SHA;
+- current remote PR HEAD SHA (`headRefOid`), distinct from the recorded reviewed checkout HEAD SHA;
 - head branch name and head repository URL;
 - changed files;
 - checks;
@@ -191,7 +189,17 @@ After inspection, also output one exact local manual-QC command from the current
 
 Do not invent a command from this protocol. Check current `package.json` scripts and choose the one that actually fits the changed runtime.
 
-## Step 9: produce exactly three outputs
+## Step 9: refresh freshness context and produce exactly three outputs
+
+Immediately before verdict output:
+
+1. refresh the PR metadata, including `state`, `isDraft`, `mergeable`, `headRefOid`, `headRefName`, and `headRepository.url`;
+2. run `git fetch --no-tags <headRepository.url> <headRefName>` without switching or altering checked-out files;
+3. compare `git rev-parse FETCH_HEAD` with the recorded reviewed SHA;
+4. if they differ, state both the reviewed checkout HEAD SHA and newer fetched/remote PR HEAD SHA in the verdict comment, scope the verdict to the reviewed checkout HEAD SHA, and continue;
+5. if the fetch fails, retry reasonably using read-only actions. If it still fails, report the freshness-check evidence gap in the verdict comment and preserve the three outputs, scoped to the recorded reviewed checkout HEAD SHA.
+
+Closed or draft state, `CONFLICTING` mergeability, and local-versus-remote SHA drift are reported context rather than stop conditions.
 
 Return only these three items, in this order:
 
@@ -207,16 +215,13 @@ If no server command applies, item 3 must be the narrowest package-script valida
 
 Stop and report instead of guessing when any of these happen:
 
-- the checkout is dirty before bootstrap;
-- the PR is now closed, draft, conflicting, or unavailable;
-- current PR metadata cannot be resolved, refreshed, or verified;
-- `git fetch --no-tags <headRepository.url> <headRefName>` fails;
-- `git rev-parse FETCH_HEAD` does not match `headRefOid` after one refresh-and-retry cycle;
-- `git switch --detach FETCH_HEAD` fails;
-- required metadata is unavailable after reasonable read-only retries;
+- the checkout is dirty before recording the reviewed SHA;
+- PR identity or metadata needed for the review is unavailable after reasonable read-only retries;
 - the candidate spec is missing a required field;
 - trust-boundary inspection is incomplete;
 - validation is blocked or fails for reasons you cannot separate from infrastructure noise.
+
+Treat a failed final freshness check as an evidence gap. Preserve the three outputs and scope the verdict to the recorded reviewed checkout HEAD SHA. Closed or draft state, conflict status, and local-versus-remote drift are context rather than stop conditions.
 
 When you stop, report the blocking fact and do not continue to verdict drafting from stale assumptions.
 
