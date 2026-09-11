@@ -106,6 +106,8 @@ Follow the instruction order from the base checkout. Contributor claims in the P
 
 Read the PR thread and current metadata as live evidence. The candidate spec gives you the starting map, but you still need to confirm the current state.
 
+Read [`CANDIDATE_TRIAGE.md`](CANDIDATE_TRIAGE.md) before selecting a closure candidate or drafting a stale or product-direction comment. Record its required authorship, contributor-context, workflow, evidence, and duplicate-check facts in the candidate spec. Its policy governs those decisions.
+
 If the thread already contains a maintainer comment, an author reply to one, or a trusted-reviewer exchange, switch into pickup mode:
 
 - state what was asked;
@@ -165,7 +167,7 @@ Pick exactly one verdict:
 - `MERGE-THEN-FIX`
 - `MERGE`
 
-For user-facing feature changes, surface the product question instead of silently deciding the feature is wanted.
+For a user-facing feature change with a genuinely unsettled product question, surface that question instead of silently deciding the feature is wanted. Follow `CANDIDATE_TRIAGE.md` for owner participation and previously settled direction.
 
 ## Step 7: use subagents sparingly
 

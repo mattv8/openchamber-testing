@@ -70,6 +70,8 @@ Discovery verifies the live PR, records and reviews the prepared checkout HEAD, 
 
 The review kickoff should produce exactly three outputs: a clickable PR link, a complete final verdict comment draft, and one exact local QC command.
 
+Before finding closure candidates or commenting on staleness or product direction, read and follow [`review-kit/CANDIDATE_TRIAGE.md`](review-kit/CANDIDATE_TRIAGE.md). It requires evidence for authorship, contributor context, workflow state, and duplicate comments before a recommendation is made.
+
 Run the focused contract test when you change the review protocol:
 
 ```sh

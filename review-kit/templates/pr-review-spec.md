@@ -15,6 +15,20 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 - Reviewed checkout HEAD SHA: `{{REVIEWED_CHECKOUT_HEAD_SHA}}`
 - Current remote PR HEAD SHA: `{{PR_HEAD_SHA}}`
 
+## Candidate triage record
+
+Read [`CANDIDATE_TRIAGE.md`](../CANDIDATE_TRIAGE.md) before completing this record. Record an unknown role or workflow state with the sources checked; it holds an unsupported closure recommendation, not useful technical review. If no closure or comment is proposed, mark that reason field not applicable and explain why.
+
+- Author and contributor relationship/history evidence: `{{AUTHOR_CONTRIBUTOR_CONTEXT_WITH_URLS}}`
+- Commit-author and co-author evidence: `{{COMMIT_AUTHOR_COAUTHOR_CONTEXT_WITH_URLS}}`
+- Owner or maintainer implementation participation and product-decision evidence: `{{OWNER_PARTICIPATION_AND_DECISION_CONTEXT_WITH_URLS}}`
+- Next-action responsibility and workflow state: `{{NEXT_ACTOR_AND_WORKFLOW_STATE}}`
+- Last concrete request, author response, changes since, and dated evidence: `{{REQUEST_RESPONSE_AND_FOLLOW_UP_WITH_URLS}}`
+- Closure or comment reason independent of age, conflicts, draft status, and commit cadence: `{{EVIDENCE_BACKED_REASON_OR_HOLD}}`
+- Decision sources: `{{TRIAGE_DECISION_SOURCE_URLS}}`
+- Existing-equivalent-comment, formal-review, and inline-comment context: `{{EXISTING_EQUIVALENT_COMMENT_CONTEXT_WITH_URLS_OR_NONE}}`
+- Fresh metadata and semantic-duplicate check result: `{{FRESHNESS_AND_DUPLICATE_CHECK_RESULT}}`
+
 ## Current PR state after bootstrap
 
 - Open state: `{{PR_STATE}}`
@@ -54,7 +68,7 @@ Replace every `{{TOKEN}}`. Leave no prose placeholders behind.
 ## Holding comment status
 
 - Unposted holding comment draft: `{{HOLDING_COMMENT_DRAFT}}`
-- Existing equivalent comment URL, if one already exists: `{{EXISTING_EQUIVALENT_COMMENT_URL_OR_NONE}}`
+- Existing equivalent comment URL, if one already exists: record it in the candidate triage record.
 
 ## Manual QC launch hint
 
